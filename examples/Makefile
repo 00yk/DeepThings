@@ -19,8 +19,16 @@ AR=ar
 ARFLAGS=rcs
 LDFLAGS= -lm -pthread
 CFLAGS=-Wall -fPIC
-COMMON=-I$(DEEPTHINGS)/include/ -I$(DEEPTHINGS)/src/ -I$(DISTRIOT)/include/ -I$(DISTRIOT)/src/ -I$(DARKNET)/include/ -I$(DARKNET)/src/ -I. 
-LDLIB=-L$(DISTRIOT) -l:$(DISTRIOTLIB) -L$(DARKNET) -l:$(DARKNETLIB)
+COMMON=-I$(DEEPTHINGS)/include/ -I$(DEEPTHINGS)/src/ -I$(DISTRIOT)/include/ -I$(DISTRIOT)/src/ -I$(DARKNET)/include/ -I$(DARKNET)/src/ -I.
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
+	LDLIB=-L$(DISTRIOT) -l:$(DISTRIOTLIB) -L$(DARKNET) -l:$(DARKNETLIB)
+endif
+ifeq ($(UNAME), Darwin)
+	LDLIB=$(DISTRIOT)/$(DISTRIOTLIB) $(DARKNET)/$(DARKNETLIB)
+endif
 
 ifeq ($(OPENMP), 1) 
 CFLAGS+= -fopenmp
@@ -52,7 +60,7 @@ DEPS = $(wildcard */*.h) Makefile
 all: obj $(EXEC)
 
 $(EXEC): $(EXECOBJ) $(DARKNETLIB) $(DISTRIOTLIB)
-	$(CC) $(COMMON) $(CFLAGS) $(EXECOBJ) -o $@  $(LDLIB) $(LDFLAGS)
+	$(CC) $(COMMON) $(CFLAGS) $(EXECOBJ) -o $@ $(LDLIB) $(LDFLAGS)
 
 $(DARKNETLIB):
 	$(MAKE) -C $(DARKNET) NNPACK=$(NNPACK) ARM_NEON=$(ARM_NEON) DEBUG=$(DEBUG) OPENMP=$(OPENMP) all

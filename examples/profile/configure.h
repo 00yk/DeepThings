@@ -25,6 +25,6 @@
 #define GATEWAY_LOCAL_ADDR "192.168.4.1"
 #define EDGE_ADDR_LIST    {"192.168.4.9", "192.168.4.8", "192.168.4.4", "192.168.4.14", "192.168.4.15", "192.168.4.16"}
 #define MAX_EDGE_NUM 6
-#define FRAME_NUM 4
+#define FRAME_NUM 6
 
 #endif

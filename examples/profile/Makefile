@@ -1,6 +1,6 @@
 OPENMP=0
-NNPACK=1
-ARM_NEON=1
+NNPACK=0
+ARM_NEON=0
 DEBUG=0
 DEEPTHINGS=../..
 DARKNET=../../darknet-nnpack
@@ -19,8 +19,15 @@ AR=ar
 ARFLAGS=rcs
 LDFLAGS= -lm -pthread
 CFLAGS=-Wall -fPIC
-COMMON=-I$(DEEPTHINGS)/src/ -I$(DISTRIOT)/include/ -I$(DISTRIOT)/src/ -I$(DARKNET)/include/ -I$(DARKNET)/src/ -I. 
-LDLIB=-L$(DISTRIOT) -l:$(DISTRIOTLIB) -L$(DARKNET) -l:$(DARKNETLIB)
+COMMON=-I$(DEEPTHINGS)/src/ -I$(DISTRIOT)/include/ -I$(DISTRIOT)/src/ -I$(DARKNET)/include/ -I$(DARKNET)/src/ -I.
+
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	LDLIB=-L$(DISTRIOT) -l:$(DISTRIOTLIB) -L$(DARKNET) -l:$(DARKNETLIB)
+endif
+ifeq ($(UNAME), Darwin)
+	LDLIB=$(DISTRIOT)/$(DISTRIOTLIB) $(DARKNET)/$(DARKNETLIB)
+endif
 
 ifeq ($(OPENMP), 1) 
 CFLAGS+= -fopenmp
@@ -40,7 +47,8 @@ endif
 
 ifeq ($(ARM_NEON), 1)
 COMMON+= -DARM_NEON
-CFLAGS+= -DARM_NEON -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize
+# CFLAGS+= -DARM_NEON -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize
+CFLAGS+= -DARM_NEON -funsafe-math-optimizations -ftree-vectorize
 endif
 
 CFLAGS+=$(OPTS)
